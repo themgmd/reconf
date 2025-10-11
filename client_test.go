@@ -6,7 +6,7 @@ import (
 )
 
 func TestClient_GetValue(t *testing.T) {
-	client := &Client{
+	client := &ConfigClient{
 		config: make(map[string]Value),
 		secret: make(map[string]string),
 	}
