@@ -9,14 +9,14 @@ import (
 
 func TestContext_WithContext(t *testing.T) {
 	ctx := context.Background()
-	cfg := &Client{}
+	cfg := &ConfigClient{}
 
 	ctxWithCfg := WithContext(ctx, cfg)
 	require.NotNil(t, ctxWithCfg.Value(configCtxKeyValue))
 }
 
 func TestContext_FromContext(t *testing.T) {
-	cfg := &Client{}
+	cfg := &ConfigClient{}
 
 	t.Run("config in context", func(t *testing.T) {
 		ctx := context.Background()
@@ -24,7 +24,7 @@ func TestContext_FromContext(t *testing.T) {
 
 		cfgFromCtx := FromContext(ctxWithCfg)
 		require.NotNil(t, cfgFromCtx)
-		require.Equal(t, *cfg, *cfgFromCtx)
+		require.Equal(t, cfg, cfgFromCtx)
 	})
 
 }
