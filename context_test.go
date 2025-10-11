@@ -1,0 +1,30 @@
+package reconf
+
+import (
+	"context"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
+
+func TestContext_WithContext(t *testing.T) {
+	ctx := context.Background()
+	cfg := &Client{}
+
+	ctxWithCfg := WithContext(ctx, cfg)
+	require.NotNil(t, ctxWithCfg.Value(configCtxKeyValue))
+}
+
+func TestContext_FromContext(t *testing.T) {
+	cfg := &Client{}
+
+	t.Run("config in context", func(t *testing.T) {
+		ctx := context.Background()
+		ctxWithCfg := WithContext(ctx, cfg)
+
+		cfgFromCtx := FromContext(ctxWithCfg)
+		require.NotNil(t, cfgFromCtx)
+		require.Equal(t, *cfg, *cfgFromCtx)
+	})
+
+}
