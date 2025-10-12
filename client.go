@@ -2,6 +2,7 @@ package reconf
 
 import (
 	"fmt"
+	"github.com/themgmd/reconf/internal/constants"
 	"log"
 	"os"
 
@@ -69,8 +70,11 @@ func NewClient() Client {
 	cfg := &ConfigClient{}
 
 	// достаем переменные окружения
-	env := os.Getenv("APP_ENVIRONMENT")
-	configDir := os.Getenv("LOCAL_CONFIG")
+	env := os.Getenv(constants.AppEnvKey)
+	configDir := os.Getenv(constants.LocalConfigKey)
+	if configDir == "" {
+		configDir = "./build/configs"
+	}
 
 	// вычитываем дефолтную конфигурацию
 	filename := fmt.Sprintf("%s/values.yaml", configDir)
