@@ -1,9 +1,11 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/themgmd/reconf/internal/constants"
 	"os"
+
+	"github.com/spf13/cobra"
+
+	"github.com/themgmd/reconf/internal/constants"
 )
 
 // rootCmd represents the base command when called without any subcommands.

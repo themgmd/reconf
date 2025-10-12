@@ -1,5 +1,5 @@
 package constants
 
 const (
-	CLIVersion = "0.0.3"
+	CLIVersion = "0.0.4"
 )

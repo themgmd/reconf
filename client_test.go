@@ -1,14 +1,26 @@
 package reconf
 
 import (
-	"github.com/stretchr/testify/require"
+	"context"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
+type testSecretMock struct{}
+
+// GetValue get value from mock secret client
+func (c *testSecretMock) GetValue(context.Context, string) (string, error) {
+	return "value", nil
+}
+
 func TestClient_GetValue(t *testing.T) {
+	ctx := context.Background()
+
 	client := &ConfigClient{
-		config: make(map[string]Value),
-		secret: make(map[string]string),
+		config:       make(map[string]Value),
+		secret:       make(map[string]string),
+		secretClient: &testSecretMock{},
 	}
 
 	t.Run("GetValue from config", func(t *testing.T) {
@@ -18,7 +30,7 @@ func TestClient_GetValue(t *testing.T) {
 			},
 		}
 
-		value := client.GetValue("test")
+		value := client.GetValue(ctx, "test")
 		require.Equal(t, value.String(), "value")
 	})
 
@@ -27,7 +39,7 @@ func TestClient_GetValue(t *testing.T) {
 			"vault_key": "value",
 		}
 
-		value := client.GetValue("vault_key")
+		value := client.GetValue(ctx, "vault_key")
 		require.Equal(t, value.String(), "value")
 	})
 }
