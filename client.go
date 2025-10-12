@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/themgmd/reconf/internal/constants"
 	"log"
+	"log/slog"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -18,6 +19,8 @@ type Client interface {
 type ConfigClient struct {
 	config map[string]Value
 	secret map[string]string
+
+	secretClient Secret
 }
 
 // GetValue - receive config variable
@@ -29,6 +32,12 @@ func (c *ConfigClient) GetValue(name string) Valuer {
 	}
 
 	// if variable not found in config map
+	// if secret client not initialized return nil value and log error
+	if len(c.secret) > 0 && c.secretClient == nil {
+		slog.Error("secret client is nil")
+		return &Value{}
+	}
+
 	// look at secret map
 	value = c.getSecretValue(name)
 	if value != nil {
@@ -49,19 +58,14 @@ func (c *ConfigClient) getConfigValue(name string) Valuer {
 }
 
 func (c *ConfigClient) getSecretValue(name string) Valuer {
-	// todo: goto vault and get
 	secretKey, ok := c.secret[name]
 	if !ok {
 		return nil
 	}
 
-	return receiveSecretValue(secretKey)
-}
-
-func receiveSecretValue(name string) *Value {
-	// todo: receive value from vault
+	secretValue := c.secretClient.GetValue(secretKey)
 	return &Value{
-		values: []any{name},
+		values: []any{secretValue},
 	}
 }
 
