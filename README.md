@@ -80,9 +80,15 @@ go get github.com/themgmd/reconf
 
 2. Пример кода
 ```go
-cfg := reconf.NewClient()
-ctx = reconf.WithContext(context.Background(), cfg)
+package main
 
-dsn := cfg.GetValue(config.PostgresDsn).String()
-fmt.Println(dsn)
+import "github.com/themgmd/reconf"
+
+func main() {
+	cfg := reconf.NewClient()
+	ctx = reconf.WithContext(context.Background(), cfg)
+
+	dsn := cfg.GetValue(config.PostgresDsn).String()
+	fmt.Println(dsn)
+}
 ```
