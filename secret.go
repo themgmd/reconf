@@ -1,6 +1,8 @@
 package reconf
 
+import "context"
+
 // Secret хранилище секретов
 type Secret interface {
-	GetValue(key string) string
+	GetValue(ctx context.Context, key string) (string, error)
 }
