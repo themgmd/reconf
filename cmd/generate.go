@@ -60,6 +60,11 @@ func init() {
 	)
 
 	generateCmd.AddCommand(genTemplateCmd)
+	genTemplateCmd.Flags().StringVarP(
+		&configDir,
+		"dir", "d", "./build/configs",
+		"set directory for config files",
+	)
 }
 
 // generateKeysCmd generate file with config variables keys
