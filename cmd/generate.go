@@ -2,15 +2,17 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/themgmd/reconf/internal/constants"
 	"go/format"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/spf13/cobra"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+	"gopkg.in/yaml.v3"
+
+	"github.com/themgmd/reconf/internal/constants"
 )
 
 var (

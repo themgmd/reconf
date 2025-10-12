@@ -1,27 +1,32 @@
 package reconf
 
 import (
+	"context"
 	"fmt"
-	"github.com/themgmd/reconf/internal/constants"
 	"log"
+	"log/slog"
 	"os"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/themgmd/reconf/internal/constants"
 )
 
 // Client .
 type Client interface {
-	GetValue(name string) Valuer
+	GetValue(ctx context.Context, name string) Valuer
 }
 
 // ConfigClient .
 type ConfigClient struct {
 	config map[string]Value
 	secret map[string]string
+
+	secretClient Secret
 }
 
 // GetValue - receive config variable
-func (c *ConfigClient) GetValue(name string) Valuer {
+func (c *ConfigClient) GetValue(ctx context.Context, name string) Valuer {
 	// at first look variable in config map
 	value := c.getConfigValue(name)
 	if value != nil {
@@ -29,8 +34,14 @@ func (c *ConfigClient) GetValue(name string) Valuer {
 	}
 
 	// if variable not found in config map
+	// if secret client not initialized return nil value and log error
+	if len(c.secret) > 0 && c.secretClient == nil {
+		slog.Error("secret client is nil")
+		return &Value{}
+	}
+
 	// look at secret map
-	value = c.getSecretValue(name)
+	value = c.getSecretValue(ctx, name)
 	if value != nil {
 		return value
 	}
@@ -48,21 +59,28 @@ func (c *ConfigClient) getConfigValue(name string) Valuer {
 	return &configValue
 }
 
-func (c *ConfigClient) getSecretValue(name string) Valuer {
-	// todo: goto vault and get
+func (c *ConfigClient) getSecretValue(ctx context.Context, name string) Valuer {
 	secretKey, ok := c.secret[name]
 	if !ok {
 		return nil
 	}
 
-	return receiveSecretValue(secretKey)
+	secretValue, err := c.secretClient.GetValue(ctx, secretKey)
+	if err != nil {
+		slog.Error("error getting secret value from secret client",
+			"secret_key", secretKey,
+			"error", err.Error(),
+		)
+	}
+
+	return &Value{
+		values: []any{secretValue},
+	}
 }
 
-func receiveSecretValue(name string) *Value {
-	// todo: receive value from vault
-	return &Value{
-		values: []any{name},
-	}
+// SetSecretClient устанавливает клиент секретов
+func (c *ConfigClient) SetSecretClient(secret Secret) {
+	c.secretClient = secret
 }
 
 // NewClient new config client
