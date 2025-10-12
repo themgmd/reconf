@@ -11,7 +11,7 @@ import (
 	"github.com/themgmd/reconf/internal/constants"
 )
 
-// Secret .
+// Secret клиент для работы с секретами от волта
 type Secret interface {
 	KvV2Read(ctx context.Context, path string, options ...vault.RequestOption) (*vault.Response[schema.KvV2ReadResponse], error)
 }
