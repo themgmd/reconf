@@ -43,3 +43,9 @@ func TestClient_GetValue(t *testing.T) {
 		require.Equal(t, value.String(), "value")
 	})
 }
+
+func TestClient_NewClient(t *testing.T) {
+	client, err := NewClient()
+	require.NoError(t, err)
+	require.NotNil(t, client)
+}
