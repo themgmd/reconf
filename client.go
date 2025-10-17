@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 
@@ -83,15 +84,25 @@ func (c *ConfigClient) SetSecretClient(secret Secret) {
 	c.secretClient = secret
 }
 
+type configClient struct {
+	Config map[string]Value  `json:"config"`
+	Secret map[string]string `json:"secret"`
+}
+
 // NewClient new config client
-func NewClient() Client {
+func NewClient() (Client, error) {
 	cfg := &ConfigClient{}
+
+	workDirectory, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
 
 	// достаем переменные окружения
 	env := os.Getenv(constants.AppEnvKey)
 	configDir := os.Getenv(constants.LocalConfigKey)
 	if configDir == "" {
-		configDir = "./build/configs"
+		configDir = filepath.Join(workDirectory, "build", "config")
 	}
 
 	// вычитываем дефолтную конфигурацию
@@ -102,19 +113,19 @@ func NewClient() Client {
 		log.Fatalf("failed to read yaml: %v", err)
 	}
 
-	var content map[string]interface{}
+	var content configClient
 	if err = yaml.Unmarshal(values, &content); err != nil {
 		log.Fatalf("failed to unmarshal yaml: %v", err)
 	}
 
 	// устанавливает значения дефолтного конфига
-	cfg.config = content["config"].(map[string]Value)
-	cfg.secret = content["secret"].(map[string]string)
+	cfg.config = content.Config
+	cfg.secret = content.Secret
 
 	// если не задано окружение возвращаем конфиг
 	// с дефолтным набором переменных из главного файла
 	if env == "" {
-		return cfg
+		return cfg, nil
 	}
 
 	// вычитываем конфигурацию для текущего окружения
@@ -130,13 +141,13 @@ func NewClient() Client {
 	}
 
 	// перезаписываем измененные данные в конфиге
-	for k, v := range content["config"].(map[string]Value) {
+	for k, v := range content.Config {
 		cfg.config[k] = v
 	}
 
-	for k, v := range content["secret"].(map[string]string) {
+	for k, v := range content.Secret {
 		cfg.secret[k] = v
 	}
 
-	return cfg
+	return cfg, nil
 }

@@ -22,7 +22,8 @@ func TestContext_FromContext(t *testing.T) {
 		ctx := context.Background()
 		ctxWithCfg := WithContext(ctx, cfg)
 
-		cfgFromCtx := FromContext(ctxWithCfg)
+		cfgFromCtx, err := FromContext(ctxWithCfg)
+		require.NoError(t, err)
 		require.NotNil(t, cfgFromCtx)
 		require.Equal(t, cfg, cfgFromCtx)
 	})

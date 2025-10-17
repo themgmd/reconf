@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/hashicorp/vault-client-go"
 	"github.com/hashicorp/vault-client-go/schema"
@@ -33,12 +34,12 @@ func (c *Client) GetValue(ctx context.Context, key string) (string, error) {
 		env = constants.EnvDev
 	}
 
-	vaultpath := fmt.Sprintf("secret/data/%s", env)
+	vaultpath := filepath.Join("secret", "data", env)
 
 	// read the secret
 	s, err := c.secret.KvV2Read(ctx, key, vault.WithMountPath(vaultpath))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("secret.KvV2Read: %w", err)
 	}
 
 	return s.Data.Data[key].(string), nil
