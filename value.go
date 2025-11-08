@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Valuer config value
+// Valuer configs value
 type Valuer interface {
 	yaml.Unmarshaler
 

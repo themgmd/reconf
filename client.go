@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 
@@ -26,21 +27,15 @@ type ConfigClient struct {
 	secretClient Secret
 }
 
-// GetValue - receive config variable
+// GetValue - receive configs variable
 func (c *ConfigClient) GetValue(ctx context.Context, name string) Valuer {
-	// at first look variable in config map
+	// at first look variable in configs map
 	value := c.getConfigValue(name)
 	if value != nil {
 		return value
 	}
 
-	// if variable not found in config map
-	// if secret client not initialized return nil value and log error
-	if len(c.secret) > 0 && c.secretClient == nil {
-		slog.Error("secret client is nil")
-		return &Value{}
-	}
-
+	// if variable not found in configs map
 	// look at secret map
 	value = c.getSecretValue(ctx, name)
 	if value != nil {
@@ -66,6 +61,14 @@ func (c *ConfigClient) getSecretValue(ctx context.Context, name string) Valuer {
 		return nil
 	}
 
+	// if secret client not initialized search variable in environment
+	if c.secretClient == nil {
+		value := os.Getenv(strings.ToUpper(secretKey))
+		return &Value{
+			values: []any{value},
+		}
+	}
+
 	secretValue, err := c.secretClient.GetValue(ctx, secretKey)
 	if err != nil {
 		slog.Error("error getting secret value from secret client",
@@ -85,11 +88,11 @@ func (c *ConfigClient) SetSecretClient(secret Secret) {
 }
 
 type configClient struct {
-	Config map[string]Value  `json:"config"`
+	Config map[string]Value  `json:"configs"`
 	Secret map[string]string `json:"secret"`
 }
 
-// NewClient new config client
+// NewClient new configs client
 func NewClient() (Client, error) {
 	cfg := &ConfigClient{}
 
@@ -102,7 +105,7 @@ func NewClient() (Client, error) {
 	env := os.Getenv(constants.AppEnvKey)
 	configDir := os.Getenv(constants.LocalConfigKey)
 	if configDir == "" {
-		configDir = filepath.Join(workDirectory, "build", "config")
+		configDir = filepath.Join(workDirectory, "build", "configs")
 	}
 
 	// вычитываем дефолтную конфигурацию
