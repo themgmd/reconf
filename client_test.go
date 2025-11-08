@@ -2,6 +2,7 @@ package reconf
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -23,7 +24,7 @@ func TestClient_GetValue(t *testing.T) {
 		secretClient: &testSecretMock{},
 	}
 
-	t.Run("GetValue from config", func(t *testing.T) {
+	t.Run("GetValue from configs", func(t *testing.T) {
 		client.config = map[string]Value{
 			"test": {
 				values: []any{"value"},
@@ -31,7 +32,7 @@ func TestClient_GetValue(t *testing.T) {
 		}
 
 		value := client.GetValue(ctx, "test")
-		require.Equal(t, value.String(), "value")
+		require.Equal(t, "value", value.String())
 	})
 
 	t.Run("GetValue from secret", func(t *testing.T) {
@@ -40,7 +41,20 @@ func TestClient_GetValue(t *testing.T) {
 		}
 
 		value := client.GetValue(ctx, "vault_key")
-		require.Equal(t, value.String(), "value")
+		require.Equal(t, "value", value.String())
+	})
+
+	t.Run("secretClient is nil", func(t *testing.T) {
+		client.secretClient = nil
+		client.secret = map[string]string{
+			"vault_key": "value",
+		}
+
+		err := os.Setenv("VALUE", "value")
+		require.NoError(t, err)
+
+		value := client.GetValue(ctx, "vault_key")
+		require.Equal(t, "value", value.String())
 	})
 }
 

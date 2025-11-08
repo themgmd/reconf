@@ -18,7 +18,7 @@ func TestContext_WithContext(t *testing.T) {
 func TestContext_FromContext(t *testing.T) {
 	cfg := &ConfigClient{}
 
-	t.Run("config in context", func(t *testing.T) {
+	t.Run("configs in context", func(t *testing.T) {
 		ctx := context.Background()
 		ctxWithCfg := WithContext(ctx, cfg)
 
