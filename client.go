@@ -132,7 +132,7 @@ func NewClient() (Client, error) {
 	}
 
 	// вычитываем конфигурацию для текущего окружения
-	filename = fmt.Sprintf("%s/values_%s.yaml", configDir, env)
+	filename = fmt.Sprintf("%s/values_%s.yaml", configDir, strings.ToLower(env))
 
 	envValues, err := os.ReadFile(filename)
 	if err != nil {
