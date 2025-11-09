@@ -13,7 +13,7 @@ const DefaultConfigTemplate = `##
 ##  переопределить значение переменных конфигурации для конкретного окружения
 ##
 
-configs:
+config:
   # http
   http_port: 8080
 
@@ -36,7 +36,7 @@ const environmentConfigTemplate = `##
 ##  secret: по ключу задаются ключи волта, в котором хранятся переменные
 ##
 
-configs:
+config:
   # http
   http_port: 6080
 

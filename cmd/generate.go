@@ -82,7 +82,7 @@ func generateKeysCmd(*cobra.Command, []string) error {
 		log.Fatalf("failed to unmarshal yaml: %v", err)
 	}
 
-	configMap, ok := content["configs"].(map[string]interface{})
+	configMap, ok := content["config"].(map[string]interface{})
 	if !ok {
 		log.Fatalf("configs block not found or invalid")
 	}
