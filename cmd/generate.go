@@ -57,7 +57,7 @@ func init() {
 	)
 	genKeysCmd.Flags().StringVarP(
 		&outDir,
-		"out", "o", "./internal/configs",
+		"out", "o", "./internal/config",
 		"set output directory for configs keys",
 	)
 
